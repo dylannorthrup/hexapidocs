@@ -26,6 +26,8 @@ The main helper is Chris Woods who programmed the API in the first place.  A lot
 is taken from various posters on the Hex Forums, specifically the Hex API thread ( http://forums.cryptozoic.com/showthread.php?t=40975 ).  Most of the information here is simply repackaging and updating that information.
 
 ## So, where are those files?
-[How to set up the API](http://github.com/dylannorthrup/hexapidocs/blob/MASTER/01_Setting_Up_The_API.md)
-[Example API Messages](http://github.com/dylannorthrup/hexapidocs/blob/MASTER/02_Example_Messages.md)
-[Applications that use the API](http://github.com/dylannorthrup/hexapidocs/blob/MASTER/03_Applications_That_Use_The_API.md)
+1 [How to set up the API](http://github.com/dylannorthrup/hexapidocs/blob/MASTER/01_Setting_Up_The_API.md)
+
+2 [Example API Messages](http://github.com/dylannorthrup/hexapidocs/blob/MASTER/02_Example_Messages.md)
+
+3 [Applications that use the API](http://github.com/dylannorthrup/hexapidocs/blob/MASTER/03_Applications_That_Use_The_API.md)
