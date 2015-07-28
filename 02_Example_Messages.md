@@ -11,9 +11,11 @@ More documentation to be done later... Just getting JSON stuff here for the mome
 ### Collection
 
 A collection Update (eg. from a Draft)
+
 `{"Action":"Update","CardsAdded":[{"Name":"Ashwood Blademaster","Flags":"","Guid":{"m_Guid":"b22a516f-104f-483f-ac89-f6ee51be608f"},"Gems":[]}],"CardsRemoved":[],"User":"InGameName","Message":"Collection"}`
 
 A collection Overwrite (when you first log in)
+
 `{"Action":"Overwrite","CardsAdded":[{"Name":"Abominate","Flags":"","Guid":{"m_Guid":"8eebaeb5-5ff9-48c2-ae2f-2edf2f7cad59"},"Gems":[]},{"Name":"Adamanthian Scrivener","Flags":"","Guid":{"m_Guid":"2ce8233b-c5bd-4be0-86c6-a17021b071ee"},"Gems":[]},{"Name":"Adamanthian Scrivener","Flags":"","Guid":{"m_Guid":"2ce8233b-c5bd-4be0-86c6-a17021b071ee"},"Gems":[]},{"Name":"Adamanthian Scrivener","Flags":"","Guid":{"m_Guid":"2ce8233b-c5bd-4be0-86c6-a17021b071ee"},"Gems":[]},{"Name":"Adamanthian Scrivener","Flags":"","Guid":{"m_Guid":"2ce8233b-c5bd-4be0-86c6-a17021b071ee"},"Gems":[]},{"Name":"Adamanthian Scrivener","Flags":"","Guid":{"m_Guid":"2ce8233b-c5bd-4be0-86c6-a17021b071ee"},"Gems":[]},{"Name":"Adamanthian Scrivener","Flags":"","Guid":{"m_Guid":"2ce8233b-c5bd-4be0-86c6-a17021b071ee"},"Gems":[]},{"Name":"Zombie Vulture","Flags":"","Guid":{"m_Guid":"82739458-39ca-4e80-816a-25bf1eb5343f"},"Gems":[]},{"Name":"Zombie Vulture","Flags":"","Guid":{"m_Guid":"82739458-39ca-4e80-816a-25bf1eb5343f"},"Gems":[]},{"Name":"Zombie Vulture","Flags":"","Guid":{"m_Guid":"82739458-39ca-4e80-816a-25bf1eb5343f"},"Gems":[]},{"Name":"Zombie Vulture","Flags":"","Guid":{"m_Guid":"82739458-39ca-4e80-816a-25bf1eb5343f"},"Gems":[]},{"Name":"Zombie Vulture","Flags":"","Guid":{"m_Guid":"82739458-39ca-4e80-816a-25bf1eb5343f"},"Gems":[]},{"Name":"Zombie Vulture","Flags":"","Guid":{"m_Guid":"82739458-39ca-4e80-816a-25bf1eb5343f"},"Gems":[]},{"Name":"Zombie Vulture","Flags":"","Guid":{"m_Guid":"82739458-39ca-4e80-816a-25bf1eb5343f"},"Gems":[]},{"Name":"Zombie Vulture","Flags":"","Guid":{"m_Guid":"82739458-39ca-4e80-816a-25bf1eb5343f"},"Gems":[]},{"Name":"Zombie Vulture","Flags":"","Guid":{"m_Guid":"82739458-39ca-4e80-816a-25bf1eb5343f"},"Gems":[]},{"Name":"Zombie Vulture","Flags":"","Guid":{"m_Guid":"82739458-39ca-4e80-816a-25bf1eb5343f"},"Gems":[]}],"CardsRemoved":[],"User":"InGameName","Message":"Collection"}`
 
 
