@@ -35,6 +35,9 @@ Last pick of the pack:
 {"Card":{"Name":"Touch of Xentoth","Flags":"","Guid":{"m_Guid":"69744127-4a29-4845-9889-3ce9565154e2"},"Gems":[]},"User":"InGameName","Message":"DraftCardPicked"}
 ```
 
+### GameEnded
+`{"Winners":["Warmaster Fuzzuko"],"Losers":["Uzume, Grand Concubunny"],"User":"InGameName","Message":"GameEnded"}`
+
 ### GameStarted
 `{"Players":[],"User":"InGameName","Message":"GameStarted"}`
 
