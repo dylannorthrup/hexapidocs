@@ -20,7 +20,7 @@ The `Collection` attribute can have several different values. These appear to co
 * 64: Shard Zone (where shards go when they're played)
 * 128: The Chain Zone (where cards are when they're played but not yet resolved)
 
-The `State` attribute seems to indicate whether a rard is ready or exhausted.  This is solely based on some preliminary guesses:
+The `State` attribute seems to indicate whether a card is ready or exhausted.  This is solely based on some preliminary guesses:
 * 8192 - Ready
 * 16384 - Ready on opponent's turn?
 * 16517 - Exhausted
