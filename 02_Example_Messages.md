@@ -8,6 +8,25 @@ More documentation to be done later... Just getting JSON stuff here for the mome
 ### CardUpdated
 `{"Cost":3,"Attack":7,"Defense":7,"Controller":12334,"Name":"Dreamsmoke Mystic","Gems":0,"BaseTemplate":{"m_Guid":"ac050a11-3651-4b8b-9e67-6085e716fc00"},"State":16516,"Shards":48,"Abilities":["You can see the top card of your deck.","[(2)] [ARROWR] Put the top card of your deck on the bottom of your deck.","<b>Prophecy</b> - When this enters play, the next troop in your deck gets  2[ATK]/ 2[DEF] and <b>Flight</b>. If it is a Coyotle, it gets this power."],"Attributes":2,"Collection":8,"User":"","Message":"CardUpdated"}`
 
+The `Collection` attribute can have several different values. These appear to correspond to the zone in which the card is located.
+
+* 0: Your Champion Zone (this is where your champion is located)
+* 1: The Deck Zone (seems to include your deck and your opponent's deck)
+* 2: The Hand Zone (again, seems to include your hand and your opponent's hand)
+* 4: Opposing Champion Zone (this is where your opponent's champion is located)
+* 8: In Play Zone/Battle Zone (where all the action happens)
+* 16: Discard Pile (may include your opponent's discard pile as well)
+* 32: Void Zone (*SPECULATIVE. PLEASE UPDATE THIS WHEN THIS IS VERIFIED*)
+* 64: Shard Zone (where shards go when they're played)
+* 128: The Chain Zone (where cards are when they're played but not yet resolved)
+
+The `State` attribute seems to indicate whether a rard is ready or exhausted.  This is solely based on some preliminary guesses:
+* 8192 - Ready
+* 16384 - Ready on opponent's turn?
+* 16517 - Exhausted
+* 16513 - Exhausted on opponent's turn?
+
+
 ### Collection
 
 A collection Update (eg. from a Draft)
