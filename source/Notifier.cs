@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Text;
 using System.IO;
-using Reckoning.Game;
 using Game.Shared;
 using Game.Shared.Mechanics;
 using Game.Shared.Domain;
@@ -45,16 +44,14 @@ namespace Reckoning.Game
 
             public class NotifierCardDefinition
             {
-                public string                      Name  = string.Empty;
                 public string                      Flags = string.Empty;
                 public ResourceId                  Guid  = ResourceId.Invalid;
-                public List<NotifierGemDefinition> Gems = new List<NotifierGemDefinition>();
+                public List<NotifierGemDefinition> Gems  = new List<NotifierGemDefinition>();
 
                 public NotifierCardDefinition(ICard card)
                 {
                     if (card.Template != null)
                     {
-                        Name = card.Template.m_Name;
                         Guid = card.Template.m_Id;
 
                         if (card.IsExtended)
@@ -65,12 +62,7 @@ namespace Reckoning.Game
                 public NotifierCardDefinition(card_instance_bits card)
                 {
                     if (TemplateManager.Instance.Cards.ContainsKey(card.TemplateID))
-                    {
-                        CardTemplate template = TemplateManager.Instance.Cards[card.TemplateID];
-
-                        Name = template.m_Name;
-                        Guid = template.m_Id;
-                    }
+                        Guid = card.TemplateID;
                 }
 
                 public void AddGem(EGemTypes gem)
@@ -81,78 +73,222 @@ namespace Reckoning.Game
                 public bool Is(NotifierCardDefinition other)
                 {
                     if (other != null)
-                        if ((Name == other.Name) && (Flags == other.Flags) && (Guid == other.Guid))
+                        if ((Flags == other.Flags) && (Guid == other.Guid))
                             return true;
 
                     return false;
                 }
             }
 
+            public class NotifierInventoryDefinition
+            {
+                public int        Count = 0;
+                public ResourceId Guid  = ResourceId.Invalid;
+
+                public NotifierInventoryDefinition(ResourceId guid, int count)
+                {
+                    Guid  = guid;
+                    Count = count;
+                }
+            }
+
+            public class NotifierTalentDefinition
+            {
+                public string     Name = string.Empty;
+                public ResourceId Guid = ResourceId.Invalid;
+
+                public NotifierTalentDefinition(ResourceId talent)
+                {
+                    ChampionTalentData data = TemplateManager.Instance.GetChampionTalentTemplate(talent);
+
+                    if (data != null)
+                    {
+                        Name = data.Name;
+                        Guid = talent;
+                    }
+                }
+            }
+
+            public class NotifierCardSet
+            {
+                public int        Count = 0;
+                public string     Flags = string.Empty;
+                public ResourceId Guid  = ResourceId.Invalid;
+
+                public NotifierCardSet(ResourceId guid, string flags, int count)
+                {
+                    Guid  = guid;
+                    Flags = flags;
+                    Count = count;
+                }
+            }
+
+            public class Talents : Notification
+            {
+                public ERace                          Race;
+                public string                         Champion;
+                public EChampionClass                 Class;
+                public List<NotifierTalentDefinition> Picks;
+
+                public Talents(string user, string champion, ERace race, EChampionClass cl, List<ResourceId> talents) : base(user)
+                {
+                    Race     = race;
+                    Picks    = new List<NotifierTalentDefinition>();
+                    Class    = cl;
+                    Message  = GetMessageName();
+                    Champion = champion;
+
+                    foreach (ResourceId id in talents)
+                        Picks.Add(new NotifierTalentDefinition(id));
+                }
+
+                public static string GetMessageName()
+                {
+                    return ("SaveTalents");
+                }
+            }
+
+            public class Inventory : Notification
+            {
+                public string                            Action       = string.Empty;
+                public List<NotifierInventoryDefinition> Complete     = new List<NotifierInventoryDefinition>();
+                public List<NotifierInventoryDefinition> ItemsAdded   = new List<NotifierInventoryDefinition>();
+                public List<NotifierInventoryDefinition> ItemsRemoved = new List<NotifierInventoryDefinition>();
+
+                public Inventory(string user, Dictionary<ResourceId, int> totals) : base(user)
+                {
+                    Message = GetMessageName();
+
+                    if (Notifier.CachedSentInventory.Count == 0)
+                    {
+                        Action = "Overwrite";
+
+                        foreach (KeyValuePair<ResourceId, int> pair in totals)
+                            Complete.Add(new NotifierInventoryDefinition(pair.Key, pair.Value));
+                    }
+                    else
+                    {
+                        Action = "Update";
+
+                        Notifier.SendItemsLock.WaitOne();
+                        {
+                            foreach (ResourceId id in totals.Keys)
+                                if (Notifier.CachedSentInventory.ContainsKey(id) == false)
+                                    ItemsAdded.Add(new NotifierInventoryDefinition(id, totals[id]));
+
+                            foreach (ResourceId id in Notifier.CachedSentInventory.Keys)
+                                if (totals.ContainsKey(id) == false)
+                                    ItemsRemoved.Add(new NotifierInventoryDefinition(id, Notifier.CachedSentInventory[id]));
+
+                            foreach (ResourceId id in totals.Keys)
+                                if (Notifier.CachedSentInventory.ContainsKey(id))
+                                {
+                                    int diff = totals[id] - Notifier.CachedSentInventory[id];
+
+                                    if (diff > 0)
+                                        ItemsAdded.Add(new NotifierInventoryDefinition(id, diff));
+                                    else if (diff < 0)
+                                        ItemsRemoved.Add(new NotifierInventoryDefinition(id, -diff));
+                                }
+                        }
+                        Notifier.SendItemsLock.ReleaseMutex();
+                    }
+
+                    Notifier.CachedSentInventory = totals;
+                }
+
+                public static string GetMessageName()
+                {
+                    return ("Inventory");
+                }
+            }
+
             public class Collection : Notification
             {
-                public string                       Action       = string.Empty;
-                public List<NotifierCardDefinition> CardsAdded   = null;
-                public List<NotifierCardDefinition> CardsRemoved = null;
+                public string                Action       = string.Empty;
+                public List<NotifierCardSet> Complete     = new List<NotifierCardSet>();
+                public List<NotifierCardSet> CardsAdded   = new List<NotifierCardSet>();
+                public List<NotifierCardSet> CardsRemoved = new List<NotifierCardSet>();
 
                 public Collection(string user, Dictionary<CardId, ICard> newCollection) : base(user)
                 {
                     Message = GetMessageName();
 
+                    var set   = new Dictionary<ResourceId, Dictionary<string, int>>();
                     var cards = new List<Notifier.NotifierCardDefinition>();
 
                     foreach (KeyValuePair<CardId, ICard> pair in newCollection)
                         if (pair.Value != null)
                             cards.Add(new Notifier.NotifierCardDefinition(pair.Value));
 
-                    cards.Sort((a, b) => { return (a.Name.CompareTo(b.Name)); });
+                    foreach (NotifierCardDefinition card in cards)
+                        if (set.ContainsKey(card.Guid) == false)
+                        {
+                            set[card.Guid] = new Dictionary<string, int>();
+                            set[card.Guid][card.Flags] = 1;
+                        }
+                        else
+                        {
+                            if (set[card.Guid].ContainsKey(card.Flags))
+                                set[card.Guid][card.Flags] = set[card.Guid][card.Flags] + 1;
+                            else
+                                set[card.Guid][card.Flags] = 1;
+                        }
 
                     if (Notifier.CachedSentCards.Count == 0)
                     {
-                        Action       = "Overwrite";
-                        CardsAdded   = new List<NotifierCardDefinition>(cards);
-                        CardsRemoved = new List<NotifierCardDefinition>();
+                        Action = "Overwrite";
+
+                        foreach (ResourceId id in set.Keys)
+                            foreach (string flag in set[id].Keys)
+                                Complete.Add(new NotifierCardSet(id, flag, set[id][flag]));
                     }
                     else
                     {
-                        Action       = "Update";
-                        CardsAdded   = new List<NotifierCardDefinition>();
-                        CardsRemoved = new List<NotifierCardDefinition>();
+                        Action = "Update";
 
                         Notifier.SendCardsLock.WaitOne();
                         {
                             try
                             {
-                                for (int i = 0; i < Notifier.CachedSentCards.Count; ++i)
-                                {
-                                    bool found_card = false;
-
-                                    for (int j = 0; j < cards.Count; ++j)
-                                        if (Notifier.CachedSentCards[i].Is(cards[j]))
-                                        {
-                                            found_card = true;
-                                            break;
-                                        }
-
-                                    if (found_card == false)
-                                        CardsRemoved.Add(Notifier.CachedSentCards[i]);
-                                }
-
-                                for (int i = 0; i < cards.Count; ++i)
-                                {
-                                    int found_card = -1;
-
-                                    for (int j = 0; j < Notifier.CachedSentCards.Count; ++j)
-                                        if (Notifier.CachedSentCards[j].Is(cards[i]))
-                                        {
-                                            found_card = j;
-                                            break;
-                                        }
-
-                                    if (found_card == -1)
-                                        CardsAdded.Add(cards[i]);
+                                foreach (ResourceId id in set.Keys)
+                                    if (Notifier.CachedSentCards.ContainsKey(id))
+                                    {
+                                        foreach (string str in set[id].Keys)
+                                            if (Notifier.CachedSentCards[id].ContainsKey(str) == false)
+                                                CardsAdded.Add(new NotifierCardSet(id, str, set[id][str]));
+                                    }
                                     else
-                                        Notifier.CachedSentCards.RemoveAt(found_card);
-                                }
+                                    {
+                                        foreach (string str in set[id].Keys)
+                                            CardsAdded.Add(new NotifierCardSet(id, str, set[id][str]));
+                                    }
+
+                                foreach (ResourceId id in Notifier.CachedSentCards.Keys)
+                                    if (set.ContainsKey(id))
+                                    {
+                                        foreach (string str in Notifier.CachedSentCards[id].Keys)
+                                            if (set[id].ContainsKey(str) == false)
+                                                CardsRemoved.Add(new NotifierCardSet(id, str, Notifier.CachedSentCards[id][str]));
+                                    }
+                                    else
+                                    {
+                                        foreach (string str in Notifier.CachedSentCards[id].Keys)
+                                            CardsAdded.Add(new NotifierCardSet(id, str, Notifier.CachedSentCards[id][str]));
+                                    }
+
+                                foreach (ResourceId id in set.Keys)
+                                    if (Notifier.CachedSentCards.ContainsKey(id))
+                                        foreach (string str in set[id].Keys)
+                                            if (Notifier.CachedSentCards[id].ContainsKey(str))
+                                            {
+                                                int delta = set[id][str] - Notifier.CachedSentCards[id][str];
+
+                                                if (delta > 0)
+                                                    CardsAdded.Add(new NotifierCardSet(id, str, delta));
+                                                else if (delta < 0)
+                                                    CardsRemoved.Add(new NotifierCardSet(id, str, -delta));
+                                            }
                             }
                             catch (Exception ex)
                             {
@@ -162,7 +298,7 @@ namespace Reckoning.Game
                         Notifier.SendCardsLock.ReleaseMutex();
                     }
 
-                    Notifier.CachedSentCards = cards;
+                    Notifier.CachedSentCards = set;
                 }
 
                 public static string GetMessageName()
@@ -359,9 +495,11 @@ namespace Reckoning.Game
             }
         #endregion
 
-        public static Mutex                        SendCardsLock   = new Mutex();
-        public static string                       ConfigFileName  = "api.ini";
-        public static List<NotifierCardDefinition> CachedSentCards = new List<NotifierCardDefinition>();
+        public static Mutex                                           SendCardsLock       = new Mutex();
+        public static Mutex                                           SendItemsLock       = new Mutex();
+        public static string                                          ConfigFileName      = "api.ini";
+        public static Dictionary<ResourceId, int>                     CachedSentInventory = new Dictionary<ResourceId, int>();
+        public static Dictionary<ResourceId, Dictionary<string, int>> CachedSentCards     = new Dictionary<ResourceId, Dictionary<string, int>>();
 
         private static object                    sync           = new Object();
         private static volatile Notifier         m_Instance;
@@ -465,6 +603,7 @@ namespace Reckoning.Game
                                 request.Accept        = "*/*";
                                 request.Timeout       = 5000;
                                 request.UserAgent     = "HexClient";
+                                request.ContentType   = "application/json";
                                 request.ContentLength = request_data.Length;
 
                                 using (var data_stream = request.GetRequestStream())
