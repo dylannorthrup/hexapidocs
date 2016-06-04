@@ -33,28 +33,44 @@ The possible Collection events are detailed in the [Example API Messages](http:/
 
 ## Windows Instructions
 
-Create the `api.ini` file in the main Hex directory and start Hex.
+Create the `api.ini` file in the main Hex directory and start Hex.  
+
+If you are using the standalone Hex client (downloaded from http://hextcg.com/), the typical location of this will be "C:\Program Files (x86)\HEX"
+
+If you are using the Steam installed version, it'll be under your Steam installation folder.  If you've chosen the default installation location for Steam, then the default location for your Hex installation (and where you should put your 'api.ini' file) should be "C:\Program Files (x86)\Steam\steamapps\common\HEX SHARDS OF FATE\"
 
 ## OS X Instructions
-The `api.ini` file needs to be located in a player-specific directory.  For running Hex, this is a shell script that can be run in the Terminal to copy an `api.ini` file from ~/temp/ into the most recent patch directory
+### Standalone install
+For the standalone installation of Hex, the `api.ini` file needs to be located in a player-specific directory.  For running Hex, this is a shell script that can be run in the Terminal to copy an `api.ini` file from ~/temp/ into the most recent patch directory
 
 ```
 #!/bin/bash
 #
-# A thing to make sure I can run Hex in debug mode
+# A thing to make sure I can run Hex with api.ini settings
 
 CFG_DIR=$(\ls -drt ~/Library/Caches/unity.Cryptozoic.HexPatch/h_dl_hex_gameforge_com__live*)
 
 # Make sure api.ini is in there
 if [ ! -f "${CFG_DIR}/api.ini" ]; then
-  cp ~/temp/hex/api.ini ${CFG_DIR}/api.ini
+  cp ~/temp/api.ini ${CFG_DIR}/api.ini
 fi
 
-# Now, start hex with the proper command line argument
-
-CLI_ARG=$(echo "${CFG_DIR}" | sed -e 's/\//%2f/g');
-
-/Applications/Hex.app/Contents/HexGame.app/Contents/MacOS/Hex -sp=${CLI_ARG}
 ```
 
 Once in that directory, the `api.ini` file should be ignored by the Patch Updater (correct as of 24 July 2015) and you should be able to run Hex as normal from the Finder, the Dock or wherever you'd prefer to launch it from.
+
+### Steam Install
+For the version of Hex installed by Steam, the location is "~/Library/Application Support/Steam/steamapps/common/HEX SHARDS OF FATE".  This shell script should copy 
+
+```
+#!/bin/bash
+#
+# A thing to make sure I can run Hex with api.ini settings
+
+CFG_DIR="~/Library/Application Support/Steam/SteamApps/common/HEX SHARDS OF FATE"
+
+# Make sure api.ini is in there
+if [ ! -f "${CFG_DIR}/api.ini" ]; then
+  cp ~/temp/api.ini "${CFG_DIR}/api.ini"
+fi
+```
