@@ -41,26 +41,39 @@ If you are using the Steam installed version, it'll be under your Steam installa
 
 ## OS X Instructions
 ### Standalone install
-For the standalone installation of Hex, the `api.ini` file needs to be located in a player-specific directory.  For running Hex, this is a shell script that can be run in the Terminal to copy an `api.ini` file from ~/temp/ into the most recent patch directory
+For the standalone installation of Hex, the `api.ini` file needs to be located in the application installation directory.  If you copied the client into your `/Applications` directory, the correct location is `/Applications/Hex.app/Contents/HexEnv.app/Contents/Resources`.  The following is a script that you can use to copy an `api.ini` file from your `~/temp` directory into the correct location (and, if necessary, remove the old one).
 
 ```
 #!/bin/bash
 #
 # A thing to make sure I can run Hex with api.ini settings
 
-CFG_DIR=$(\ls -drt ~/Library/Caches/unity.Cryptozoic.HexPatch/h_dl_hex_gameforge_com__live*)
+CFG_DIR="/Applications/Hex.app/Contents/HexEnv.app/Contents/Resources"
 
 # Make sure api.ini is in there
 if [ ! -f "${CFG_DIR}/api.ini" ]; then
+  # Copy the file over
   cp ~/temp/api.ini ${CFG_DIR}/api.ini
+  # Set the immutable flag so the Hex client doesn't _helpfully_
+  # remove the api.ini when it starts up
+  chflags uchg ${CFG_DIR}/api.ini
+else
+  # Unset the immutable flag, so we can copy over a new version
+  chflags nouchg ${CFG_DIR}/api.ini
+  cp ~/temp/api.ini ${CFG_DIR}/api.ini
+  chflags uchg ${CFG_DIR}/api.ini
 fi
 
 ```
 
-Once in that directory, the `api.ini` file should be ignored by the Patch Updater (correct as of 24 July 2015) and you should be able to run Hex as normal from the Finder, the Dock or wherever you'd prefer to launch it from.
+Once this is done, start up the Hex client as normal and your API messages should be sent out as configured.
 
 ### Steam Install
-For the version of Hex installed by Steam, the location is "~/Library/Application Support/Steam/steamapps/common/HEX SHARDS OF FATE".  This shell script should copy 
+**NOTE: THESE INSTRUCTION HAVE NOT BEEN VERIFIED AND LIKELY DO NOT WORK**
+
+You should likely use the same method as above (after finding the location where Steam installed the client), but I have not used the Steam install on a Mac and cannot verify this.
+
+~~For the version of Hex installed by Steam, the location is "~/Library/Application Support/Steam/steamapps/common/HEX SHARDS OF FATE".  This shell script should copy ~~
 
 ```
 #!/bin/bash
