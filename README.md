@@ -1,3 +1,6 @@
+# THIS REPO IS ARCHIVED.
+The game shut down for over three years at this point with no likelihood of resurrection. These tools are unnecessary as anything other than a historical curiosity.
+
 # hexapidocs
 Documentation on the Hex API
 
